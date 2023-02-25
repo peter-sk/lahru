@@ -7,4 +7,4 @@ do
     bzcat $input >> pile/pile.jsonl
 done
 echo Compressing the pile
-bzip2 -v -9 pile/pile.jsonl
+bzip2 -vv -9 pile/pile.jsonl

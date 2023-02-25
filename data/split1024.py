@@ -6,7 +6,7 @@ tokenizer = GPT2Tokenizer.from_pretrained("flax-community/dansk-gpt-wiki")
 for line in tqdm(i.readlines(), desc="splitting lines"):
     line = line.strip()
     f = 0
-    t = len(line)
+    t = min(20480,len(line))
 #    print(f"f = {f}   t = {t} I", file=e)
     tokens = tokenizer.tokenize(line)
     while len(tokens) > 1024:
@@ -18,7 +18,7 @@ for line in tqdm(i.readlines(), desc="splitting lines"):
         if len(tokens) <= 1024:
             print(line[f:t],file=o)
             f = t
-            t = len(line)
+            t = min(f+20480,len(line))
             print(f"f = {f}   t = {t} N",file=e)
             tokens = tokenizer.tokenize(line[f:t])
     if f < t:
