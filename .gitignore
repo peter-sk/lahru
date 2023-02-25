@@ -1,3 +1,4 @@
 /data/*/*.txt
 /data/*/*.txt.original
-/gpt2-da
+/data/pile
+/gpt2-da*
