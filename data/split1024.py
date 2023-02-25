@@ -13,13 +13,13 @@ for line in tqdm(i, desc="splitting lines"):
         t -= 1
         while line[t-2:t] != ". " and t-f > 1024:
             t -= 1
-        print(f"f = {f}   t = {t} S", file=e)
+#        print(f"f = {f}   t = {t} S", file=e)
         tokens = tokenizer.tokenize(line[f:t])
         if len(tokens) <= 1024:
             print(line[f:t],file=o)
             f = t
             t = min(f+10240,len(line))
-            print(f"f = {f}   t = {t} N",file=e)
+#            print(f"f = {f}   t = {t} N",file=e)
             tokens = tokenizer.tokenize(line[f:t])
     if f < t:
         print(line[f:t],file=o)
