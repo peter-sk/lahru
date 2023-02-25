@@ -1,0 +1,6 @@
+accelerate
+datasets
+pip
+torch
+tqdm
+transformers
