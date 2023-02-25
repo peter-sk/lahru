@@ -3,7 +3,7 @@ from sys import stderr as e, stdin as i, stdout as o
 from tqdm import tqdm
 from transformers import GPT2Tokenizer
 tokenizer = GPT2Tokenizer.from_pretrained("flax-community/dansk-gpt-wiki")
-for line in tqdm(i.readlines(), desc="splitting lines"):
+for line in tqdm(i, desc="splitting lines"):
     line = line.strip()
     f = 0
     t = min(20480,len(line))
