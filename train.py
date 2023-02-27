@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from sys import argv
 from datasets import load_dataset, DatasetDict
-from transformers import GPT2Tokenizer,GPT2LMHeadModel, DataCollatorForLanguageModeling, TrainingArguments, Trainer
+from transformers import GPT2TokenizerFast,GPT2LMHeadModel, DataCollatorForLanguageModeling, TrainingArguments, Trainer
 model_name = 'gpt2-da'
-tokenizer = GPT2Tokenizer.from_pretrained(model_name)
+tokenizer = GPT2TokenizerFast.from_pretrained(model_name)
 model = GPT2LMHeadModel.from_pretrained(model_name)
 collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,mlm=False)
 raw_dataset = load_dataset(f"data/{argv[1]}",data_files=f"{argv[1]}.jsonl.bz2").rename_column('text','input_ids')
@@ -23,15 +23,19 @@ print(tokenized_dataset)
 training_args = TrainingArguments(
     output_dir=model_name,
     overwrite_output_dir=True,
-    per_device_train_batch_size=8,
+#    per_device_train_batch_size=8,
     eval_steps=10000,
     save_steps=10000,
     logging_steps=10000,
     num_train_epochs=1,
-    auto_find_batch_size=False,
+    auto_find_batch_size=True,
     gradient_accumulation_steps=1,
     no_cuda=False,
-    fp16=True
+    fp16=True,
+    save_total_limit = 2,
+    save_strategy = "steps",
+    evaluation_strategy = "steps",
+    load_best_model_at_end=False
 )
 trainer = Trainer(
     model=model,
