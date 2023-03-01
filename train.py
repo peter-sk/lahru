@@ -7,6 +7,10 @@ model_name = 'gpt2-da'
 if args[0] == "--model":
     model_name = args[1]
     args = args[2:]
+epochs = 1
+if args[0] == "--epochs":
+    epochs = int(args[1])
+    args = args[2:]
 resume = False
 if args[0] == "--resume":
     resume = True
@@ -17,35 +21,30 @@ collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,mlm=False)
 datasets = []
 for arg in args:
     raw_dataset = load_dataset(f"data",data_files=f"{arg}.jsonl.bz2").rename_column('text','input_ids')
-    #reduced_dataset = raw_dataset['train'].train_test_split(0.99,shuffle=False,seed=42)
-    train_testvalid = raw_dataset['train'].train_test_split(0.1,shuffle=False,seed=42)
-    test_valid = train_testvalid['test'].train_test_split(0.5,shuffle=False,seed=42)
+    train_test = raw_dataset['train'].train_test_split(100000,shuffle=False,seed=42)
     dataset = DatasetDict({
-        'train': train_testvalid['train'],
-        'test': test_valid['train'],
-        'valid': test_valid['test']
+        'train': train_test['train'],
+        'test': train_test['test']
     })
     print(arg,dataset)
     datasets.append(dataset)
 dataset = DatasetDict({
     'train': concatenate_datasets([dataset['train'] for dataset in datasets]),
-    'test': concatenate_datasets([dataset['test'] for dataset in datasets]),
-    'valid': concatenate_datasets([dataset['valid'] for dataset in datasets])
+    'test': concatenate_datasets([dataset['test'] for dataset in datasets])
 })
 del datasets
 print('MERGED',dataset)
 num_embeddings = model.transformer.wte.num_embeddings
-#tokenized_dataset = dataset.map(lambda row: tokenizer(row['input_ids'])).filter(lambda row: len(row) < 512 and all((x < num_embeddings for x in row['input_ids'])))
 tokenized_dataset = dataset.map(lambda row: tokenizer(row['input_ids'])).filter(lambda row: len(row['input_ids']) < 1024 and all((x < num_embeddings for x in row['input_ids'])))
 print(tokenized_dataset)
 training_args = TrainingArguments(
     output_dir=model_name,
     overwrite_output_dir=True,
 #    per_device_train_batch_size=8,
-    eval_steps=10000,
-    save_steps=10000,
-    logging_steps=10000,
-    num_train_epochs=1,
+    eval_steps=100000,
+    save_steps=100000,
+    logging_steps=100000,
+    num_train_epochs=epochs,
     auto_find_batch_size=True,
     gradient_accumulation_steps=1,
     no_cuda=False,
