@@ -2,18 +2,21 @@
 from sys import argv
 from datasets import concatenate_datasets, load_dataset, DatasetDict
 from transformers import GPT2TokenizerFast,GPT2LMHeadModel, DataCollatorForLanguageModeling, TrainingArguments, Trainer
-model_name = 'gpt2-da'
-tokenizer = GPT2TokenizerFast.from_pretrained(model_name)
-model = GPT2LMHeadModel.from_pretrained(model_name)
-collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,mlm=False)
-datasets = []
 args = argv[1:]
+model_name = 'gpt2-da'
+if args[0] == "--model":
+    model_name = args[1]
+    args = args[2:]
 resume = False
 if args[0] == "--resume":
     resume = True
     args = args[1:]
+tokenizer = GPT2TokenizerFast.from_pretrained(model_name)
+model = GPT2LMHeadModel.from_pretrained(model_name)
+collator = DataCollatorForLanguageModeling(tokenizer=tokenizer,mlm=False)
+datasets = []
 for arg in args:
-    raw_dataset = load_dataset(f"data/{arg}",data_files=f"{arg}.jsonl.bz2").rename_column('text','input_ids')
+    raw_dataset = load_dataset(f"data",data_files=f"{arg}.jsonl.bz2").rename_column('text','input_ids')
     #reduced_dataset = raw_dataset['train'].train_test_split(0.99,shuffle=False,seed=42)
     train_testvalid = raw_dataset['train'].train_test_split(0.1,shuffle=False,seed=42)
     test_valid = train_testvalid['test'].train_test_split(0.5,shuffle=False,seed=42)
