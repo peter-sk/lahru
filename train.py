@@ -11,6 +11,10 @@ epochs = 1
 if args[0] == "--epochs":
     epochs = int(args[1])
     args = args[2:]
+steps = 1
+if args[0] == "--steps":
+    steps = int(args[1])
+    args = args[2:]
 resume = False
 if args[0] == "--resume":
     resume = True
@@ -41,15 +45,15 @@ training_args = TrainingArguments(
     output_dir=model_name,
     overwrite_output_dir=True,
 #    per_device_train_batch_size=8,
-    eval_steps=100000,
-    save_steps=100000,
-    logging_steps=100000,
+    eval_steps=int(100000/steps),
+    save_steps=int(100000/steps),
+    logging_steps=int(100000/steps),
     num_train_epochs=epochs,
     auto_find_batch_size=True,
-    gradient_accumulation_steps=1,
+    gradient_accumulation_steps=steps,
     no_cuda=False,
     fp16=True,
-    save_total_limit = 2,
+    save_total_limit = 50,
     save_strategy = "steps",
     evaluation_strategy = "steps",
     load_best_model_at_end=False
