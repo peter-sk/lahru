@@ -1,10 +1,10 @@
 #!/bin/bash
-rm -rfv pile
-mkdir pile
-for input in $(find . -name "*.jsonl.bz2")
+output=$1
+shift
+for input in "$@"
 do
     echo Adding $input
-    bzcat $input >> pile/pile.jsonl
+    bzcat $input >> $output.jsonl
 done
-echo Compressing the pile
-bzip2 -vv -9 pile/pile.jsonl
+echo Compressing $output.jsonl
+bzip2 -vv -9 $output.jsonl
